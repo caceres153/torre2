@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Registro de Residentes — Conjunto Habitacional Ramón Freire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Piazzolla:opsz,wght@8..30,500;8..30,600;8..30,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:        #211E1A;
+    --paper:      #E7E2D3;
+    --paper-raise:#F1EDE1;
+    --line:       #B7AF9E;
+    --patina:     #4B7566;
+    --patina-dark:#39584D;
+    --brass:      #A87C33;
+    --brass-dark: #7C5A22;
+    --danger:     #8C3A2B;
+    --radius:     3px;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    padding:2rem 1rem;
+    background:
+      radial-gradient(ellipse at top, #F4F0E5 0%, var(--paper) 60%);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    line-height:1.55;
+    display:flex;
+    justify-content:center;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+
+  .board{
+    position:relative;
+    width:100%;
+    max-width:30rem;
+    background:var(--paper-raise);
+    border:1px solid var(--line);
+    border-radius:6px;
+    box-shadow:0 1px 2px rgba(33,30,26,0.06), 0 12px 32px -16px rgba(33,30,26,0.35);
+    overflow:hidden;
+  }
+
+  /* corner rivets — hardware detail carried through the whole board */
+  .board::before, .board::after,
+  .plaque::before, .plaque::after{
+    content:"";
+    position:absolute;
+    width:6px; height:6px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%, #E9DDB8, var(--brass-dark) 75%);
+    box-shadow:0 1px 1px rgba(0,0,0,0.4);
+    z-index:3;
+  }
+  .plaque::before{ top:10px; left:10px; }
+  .plaque::after{ top:10px; right:10px; }
+  .board::before{ bottom:10px; left:10px; }
+  .board::after{ bottom:10px; right:10px; }
+
+  .plaque{
+    position:relative;
+    background:
+      linear-gradient(180deg, var(--patina) 0%, var(--patina-dark) 100%);
+    color:#EFEAD9;
+    padding:2.1rem 1.5rem 1.6rem;
+    text-align:center;
+    border-bottom:3px solid var(--brass);
+  }
+
+  .plaque .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:#CFE0D6;
+    margin:0 0 0.6rem;
+  }
+
+  .plaque h1{
+    font-family:'Piazzolla', serif;
+    font-weight:700;
+    font-size:clamp(1.35rem, 5.4vw, 1.7rem);
+    letter-spacing:0.02em;
+    line-height:1.2;
+    text-transform:uppercase;
+    margin:0;
+    text-shadow:0 1px 0 rgba(0,0,0,0.25);
+  }
+
+  .plaque .subtitle{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:#E9DDB8;
+    margin:0.55rem 0 0;
+    padding-top:0.55rem;
+    border-top:1px solid rgba(233,221,184,0.35);
+    display:inline-block;
+  }
+
+  .intro{
+    padding:1.6rem 1.6rem 0.4rem;
+  }
+
+  .intro p{
+    margin:0;
+    font-size:0.95rem;
+    color:#3A362F;
+  }
+
+  .divider{
+    height:1px;
+    border:0;
+    margin:1.5rem 1.6rem;
+    background:linear-gradient(90deg, transparent, var(--line) 15%, var(--line) 85%, transparent);
+  }
+
+  /* ---- Bloque de scope comunicacional ---- */
+  .scope{
+    padding:0 1.6rem;
+  }
+
+  .scope h2{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    font-weight:600;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--patina-dark);
+    margin:0 0 1rem;
+    display:flex;
+    align-items:center;
+    gap:0.7rem;
+  }
+
+  .scope h2::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+
+  .axes{
+    list-style:none;
+    margin:0;
+    padding:0;
+  }
+
+  .axis{
+    position:relative;
+    padding:0 0 0 1.1rem;
+    margin-bottom:0.95rem;
+  }
+
+  .axis::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:0.42rem;
+    width:5px;
+    height:5px;
+    background:var(--brass);
+    transform:rotate(45deg);
+  }
+
+  .axis .name{
+    display:block;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:0.9rem;
+    font-weight:600;
+    color:var(--ink);
+    line-height:1.4;
+  }
+
+  .axis .desc{
+    display:block;
+    font-size:0.86rem;
+    color:#4A453B;
+    line-height:1.5;
+    margin-top:0.1rem;
+  }
+
+  .scope-note{
+    margin:1.25rem 0 0;
+    padding:0.85rem 0.95rem;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-left:3px solid var(--patina);
+    border-radius:var(--radius);
+    font-size:0.82rem;
+    line-height:1.5;
+    color:#4A453B;
+  }
+
+  .scope-note strong{
+    font-weight:600;
+    color:var(--patina-dark);
+  }
+
+  .scope-note a{
+    color:var(--patina-dark);
+    font-weight:600;
+    text-decoration:none;
+    border-bottom:1px solid rgba(75,117,102,0.45);
+    white-space:nowrap;
+  }
+
+  form.registry{
+    padding:0 1.6rem 1.8rem;
+  }
+
+  .field{ margin-bottom:1.3rem; }
+
+  .field-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1rem;
+  }
+  @media (max-width:380px){
+    .field-row{ grid-template-columns:1fr; }
+  }
+
+  label, legend{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:#665F52;
+    margin-bottom:0.5rem;
+    padding:0;
+  }
+
+  .optional{
+    text-transform:none;
+    letter-spacing:0.02em;
+    color:#8A8272;
+  }
+
+  input[type="text"],
+  input[type="tel"]{
+    width:100%;
+    border:none;
+    border-bottom:1.5px solid var(--line);
+    background:transparent;
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:1rem;
+    color:var(--ink);
+    padding:0.4rem 0.1rem;
+    border-radius:0;
+  }
+
+  input[type="text"]:focus,
+  input[type="tel"]:focus{
+    outline:none;
+    border-bottom-color:var(--patina);
+    box-shadow:0 1.5px 0 0 var(--patina);
+  }
+
+  fieldset.condition{
+    border:none;
+    padding:0;
+    margin:0 0 1.3rem;
+  }
+
+  .condition-group{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0.7rem;
+  }
+
+  .condition-option{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    border:1.5px solid var(--line);
+    border-radius:var(--radius);
+    padding:0.7rem 0.5rem;
+    cursor:pointer;
+    font-size:0.9rem;
+    font-weight:500;
+    color:#4A453B;
+    background:var(--paper);
+    margin:0;
+  }
+
+  .condition-option input{
+    position:absolute;
+    opacity:0;
+    width:100%;
+    height:100%;
+    margin:0;
+    cursor:pointer;
+  }
+
+  .condition-option:has(input:checked){
+    border-color:var(--patina);
+    background:#E3EAE4;
+    color:var(--patina-dark);
+    font-weight:600;
+  }
+
+  .condition-option:has(input:focus-visible){
+    outline:2px solid var(--brass);
+    outline-offset:2px;
+  }
+
+  .consent{
+    display:flex;
+    align-items:flex-start;
+    gap:0.65rem;
+    font-size:0.82rem;
+    color:#4A453B;
+    margin-bottom:1.5rem;
+    text-transform:none;
+    letter-spacing:normal;
+    font-family:'IBM Plex Sans', sans-serif;
+    cursor:pointer;
+  }
+
+  .consent input{
+    margin-top:0.2rem;
+    flex-shrink:0;
+    accent-color:var(--patina);
+    width:1rem;
+    height:1rem;
+  }
+
+  button.submit{
+    display:block;
+    width:100%;
+    background:linear-gradient(180deg, var(--brass) 0%, var(--brass-dark) 100%);
+    color:#FBF6E9;
+    border:none;
+    border-radius:var(--radius);
+    padding:0.95rem 1rem;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.82rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 2px 0 var(--brass-dark), 0 8px 18px -8px rgba(124,90,34,0.6);
+  }
+
+  button.submit:hover{ filter:brightness(1.05); }
+  button.submit:active{ transform:translateY(1px); box-shadow:0 1px 0 var(--brass-dark); }
+  button.submit:disabled{ opacity:0.6; cursor:wait; }
+  button.submit:focus-visible{ outline:2px solid var(--patina); outline-offset:3px; }
+
+  .form-error{
+    color:var(--danger);
+    font-size:0.85rem;
+    margin:0.9rem 0 0;
+    text-align:center;
+  }
+
+  .field-error{
+    color:var(--danger);
+    font-size:0.76rem;
+    line-height:1.35;
+    margin:0.35rem 0 0;
+  }
+
+  .field input[aria-invalid="true"]{
+    border-color:var(--danger);
+  }
+
+  .success{
+    padding:2.2rem 1.8rem 2rem;
+    text-align:center;
+  }
+
+  .success .mark{
+    width:2.5rem; height:2.5rem;
+    border-radius:50%;
+    background:var(--patina);
+    color:#EFEAD9;
+    display:flex; align-items:center; justify-content:center;
+    margin:0 auto 1rem;
+    font-size:1.3rem;
+  }
+
+  .success h2{
+    font-family:'Piazzolla', serif;
+    font-size:1.15rem;
+    margin:0 0 0.6rem;
+  }
+
+  .success p{
+    font-size:0.92rem;
+    color:#4A453B;
+    margin:0;
+  }
+
+  footer.foot{
+    padding:1.1rem 1.6rem 1.4rem;
+    border-top:1px solid var(--line);
+    background:var(--paper);
+  }
+
+  footer.foot p{
+    margin:0;
+    font-size:0.74rem;
+    color:#71695A;
+    text-align:center;
+    line-height:1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="board">
+
+  <header class="plaque">
+    <p class="eyebrow">Rancagua · Cáceres 153</p>
+    <h1>Conjunto Habitacional Ramón Freire</h1>
+    <p class="subtitle">Torre 2 · Registro de residentes</p>
+  </header>
+
+  <section class="intro">
+    <p>Este registro es de la comunidad: reúne los datos de quienes viven en la Torre 2 para que la información circule bien entre todos. La administración le pide tres minutos para completarlo.</p>
+  </section>
+
+  <hr class="divider">
+
+  <section class="scope">
+    <h2>Qué se informa en el grupo</h2>
+    <ul class="axes">
+      <li class="axis">
+        <span class="name">Emergencias y contingencias</span>
+        <span class="desc">Cortes de agua, luz o gas, fallas de ascensor, filtraciones o cualquier situación que afecte al edificio. En estos casos la administración avisa apenas cuenta con información, y mantiene informada a la comunidad hasta que la situación se resuelve.</span>
+      </li>
+      <li class="axis">
+        <span class="name">Acontecimientos importantes</span>
+        <span class="desc">Asambleas, votaciones, plazos que corren para todo el edificio y decisiones que involucran a la comunidad.</span>
+      </li>
+      <li class="axis">
+        <span class="name">El día a día del edificio</span>
+        <span class="desc">Mantenciones programadas, trabajos en áreas comunes, cambios de horario y avisos de rutina.</span>
+      </li>
+    </ul>
+    <p class="scope-note">El grupo «Informativos Administración Torre n°2» está pensado para que la información llegue clara y sin ruido, <strong>por eso las publicaciones las emite la administración.</strong> Cuando necesite hacer una consulta, reportar una situación o pedir apoyo, el canal directo es el WhatsApp de Conserjería: <a href="https://wa.me/56966293952">+56 9 6629 3952</a>.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- PENDIENTE: reemplazar el action por la URL /exec del despliegue de Apps Script.
+       Debe terminar en /exec, nunca en /dev. Ver TRASPASO-backend.md -->
+  <form class="registry" id="registryForm"
+        action="https://script.google.com/macros/s/AKfycbzgPuFoONQeCfKQBgLtxFfJILgJlh9npGmBlGaVoYrORP-WVOlqp0NtSIGr8k0dx9vg2g/exec"
+        method="POST">
+
+    <div class="field">
+      <label for="nombre">Nombre completo</label>
+      <input id="nombre" name="nombre" type="text" required autocomplete="name">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="depto">N.º de departamento</label>
+        <input id="depto" name="depto" type="text" required autocomplete="off"
+               inputmode="numeric" maxlength="4" placeholder="Ej: 154"
+               aria-describedby="deptoError">
+        <p class="field-error" id="deptoError" hidden>Ese número no corresponde a un departamento de la Torre N°2. Revíselo, por favor.</p>
+      </div>
+      <div class="field">
+        <label for="telefono">Teléfono</label>
+        <input id="telefono" name="telefono" type="tel" required placeholder="+56 9 1234 5678" autocomplete="tel">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="correo">Correo electrónico <span class="optional">(opcional)</span></label>
+      <input id="correo" name="correo" type="email" placeholder="nombre@correo.cl" autocomplete="email">
+    </div>
+
+    <fieldset class="condition">
+      <legend>Condición en el departamento</legend>
+      <div class="condition-group">
+        <label class="condition-option">
+          <input type="radio" name="condicion" value="Propietario" required>
+          <span>Propietario</span>
+        </label>
+        <label class="condition-option">
+          <input type="radio" name="condicion" value="Arrendatario" required>
+          <span>Arrendatario</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <!-- El value queda registrado en la planilla como evidencia del consentimiento.
+         Si algún día cambia la redacción del texto o los datos que se piden, subir a "Autoriza v3". -->
+    <label class="consent">
+      <input type="checkbox" id="consent" name="consentimiento" value="Autoriza v2" required>
+      <span>Autorizo que estos datos sean usados únicamente por la administración de Torres de la Alameda para el registro de residentes y el grupo de WhatsApp informativo del edificio.</span>
+    </label>
+
+    <!-- Honeypot: invisible para personas, los bots lo rellenan. No borrar. -->
+    <input type="text" name="website" style="display:none" tabindex="-1" autocomplete="off">
+
+    <button type="submit" class="submit" id="submitBtn">Enviar mis datos</button>
+    <p class="form-error" id="formError" hidden>No pudimos enviar sus datos. Intente nuevamente o entréguelos directamente en conserjería.</p>
+  </form>
+
+  <div class="success" id="successState" hidden>
+    <div class="mark">✓</div>
+    <h2>Registro recibido</h2>
+    <p>Gracias por registrar sus datos. La administración los incorporará al registro de residentes de la Torre N°2. Si aún no forma parte del grupo de WhatsApp informativo, recibirá el enlace de ingreso en los próximos días.</p>
+  </div>
+
+  <footer class="foot">
+    <p>Este registro complementa, no reemplaza, los boletines físicos de Torres de la Alameda.<br>Administración Torre N°2.</p>
+  </footer>
+
+</div>
+
+<script>
+  const form = document.getElementById('registryForm');
+  const submitBtn = document.getElementById('submitBtn');
+  const errorMsg = document.getElementById('formError');
+  const successState = document.getElementById('successState');
+  const deptoInput = document.getElementById('depto');
+  const deptoError = document.getElementById('deptoError');
+
+  /**
+   * Padrón de la Torre N°2: 118 departamentos.
+   * El piso 2 tiene solo 4 unidades (son más grandes); del piso 3 al 21 hay 6.
+   * Los locales comerciales quedan fuera: el registro es de residentes.
+   * Si este listado cambia, hay que actualizarlo también en la hoja "Padrón"
+   * de la planilla, que es la que usa el backend.
+   */
+  const PADRON = (function () {
+    const lista = ['21', '22', '23', '24'];
+    for (let piso = 3; piso <= 21; piso++) {
+      for (let n = 1; n <= 6; n++) lista.push(String(piso) + String(n));
+    }
+    return lista;
+  })();
+
+  function normalizarDepto(valor) {
+    return String(valor || '').replace(/[^0-9]/g, '');
+  }
+
+  function limpiarErrorDepto() {
+    deptoError.hidden = true;
+    deptoInput.removeAttribute('aria-invalid');
+  }
+
+  deptoInput.addEventListener('input', limpiarErrorDepto);
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    errorMsg.hidden = true;
+
+    // Se valida contra el padrón antes de enviar. Un número mal escrito hace
+    // doble daño: crea un departamento fantasma y deja el real figurando como
+    // no registrado.
+    const depto = normalizarDepto(deptoInput.value);
+    if (PADRON.indexOf(depto) === -1) {
+      deptoError.hidden = false;
+      deptoInput.setAttribute('aria-invalid', 'true');
+      deptoInput.focus();
+      return;
+    }
+    limpiarErrorDepto();
+    deptoInput.value = depto; // se envía normalizado: "Depto 154" viaja como "154"
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando…';
+
+    try {
+      // URLSearchParams envía application/x-www-form-urlencoded, que es un tipo
+      // permitido por CORS sin preflight. No agregar headers propios: cualquier
+      // header extra dispara un OPTIONS que Apps Script no responde.
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new URLSearchParams(new FormData(form))
+      });
+
+      if (!response.ok) throw new Error('Respuesta no exitosa');
+
+      const datos = await response.json();
+      if (!datos.ok) throw new Error(datos.error || 'rechazado_por_el_servidor');
+
+      form.hidden = true;
+      successState.hidden = false;
+    } catch (err) {
+      errorMsg.hidden = false;
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Enviar mis datos';
+    }
+  });
+</script>
+
+</body>
+</html>
