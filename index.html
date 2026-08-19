@@ -588,16 +588,16 @@
       // URLSearchParams envía application/x-www-form-urlencoded, que es un tipo
       // permitido por CORS sin preflight. No agregar headers propios: cualquier
       // header extra dispara un OPTIONS que Apps Script no responde.
-      const cuerpo = new URLSearchParams(new FormData(form));
-      let response = await fetch(form.action, { method: 'POST', body: cuerpo });
-
-      // Apps Script a veces devuelve 404 transitorios: rechaza en el borde y el
-      // script del servidor nunca llega a correr, así que reintentar es seguro
-      // (no se duplica ninguna fila). Un solo reintento, solo para este caso.
-      if (response.status === 404) {
-        await new Promise(resolve => setTimeout(resolve, 1200));
-        response = await fetch(form.action, { method: 'POST', body: cuerpo });
-      }
+      // NO reintentar ante un 404. Se probó y es peligroso: Apps Script responde
+      // el POST con un 302 hacia script.googleusercontent.com, y es esa segunda
+      // petición la que a veces devuelve 404 — para entonces doPost YA corrió y YA
+      // escribió la fila. Reintentar duplica el registro, y como en un mismo
+      // departamento sí pueden vivir dos personas, el duplicado es indistinguible
+      // de un segundo residente legítimo. Verificado el 19 de agosto de 2026.
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: new URLSearchParams(new FormData(form))
+      });
 
       if (!response.ok) throw new Error('Respuesta no exitosa');
 
