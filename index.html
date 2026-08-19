@@ -249,7 +249,8 @@
   }
 
   input[type="text"],
-  input[type="tel"]{
+  input[type="tel"],
+  input[type="email"]{
     width:100%;
     border:none;
     border-bottom:1.5px solid var(--line);
@@ -262,7 +263,8 @@
   }
 
   input[type="text"]:focus,
-  input[type="tel"]:focus{
+  input[type="tel"]:focus,
+  input[type="email"]:focus{
     outline:none;
     border-bottom-color:var(--patina);
     box-shadow:0 1.5px 0 0 var(--patina);
@@ -523,7 +525,7 @@
   </div>
 
   <footer class="foot">
-    <p>Este registro complementa, no reemplaza, los boletines físicos de Torres de la Alameda.<br>Administración Torre N°2.</p>
+    <p>Este registro complementa, no reemplaza, los boletines físicos del edificio.<br>Administración Torre N°2.</p>
   </footer>
 
 </div>
@@ -586,10 +588,16 @@
       // URLSearchParams envía application/x-www-form-urlencoded, que es un tipo
       // permitido por CORS sin preflight. No agregar headers propios: cualquier
       // header extra dispara un OPTIONS que Apps Script no responde.
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: new URLSearchParams(new FormData(form))
-      });
+      const cuerpo = new URLSearchParams(new FormData(form));
+      let response = await fetch(form.action, { method: 'POST', body: cuerpo });
+
+      // Apps Script a veces devuelve 404 transitorios: rechaza en el borde y el
+      // script del servidor nunca llega a correr, así que reintentar es seguro
+      // (no se duplica ninguna fila). Un solo reintento, solo para este caso.
+      if (response.status === 404) {
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        response = await fetch(form.action, { method: 'POST', body: cuerpo });
+      }
 
       if (!response.ok) throw new Error('Respuesta no exitosa');
 
